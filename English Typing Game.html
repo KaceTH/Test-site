@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Typing Game</title>
+    <style>
+        body {
+    font-family: 'Roboto', Arial, sans-serif;
+    background: #eaeaea;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 50px;
+}
+
+.container {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 30px;
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+font-size: 1.2rem; /* 제목 크기를 줄임 */
+color: #6c757d; /* 제목 색상을 더 은은하게 변경 */
+margin-bottom: 10px;
+font-weight: 600; /* 약간 가벼운 강조 */
+}
+
+.file-status {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+    display: none;
+}
+
+.file-input {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.file-input label {
+    font-size: 1rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.file-input input {
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: #f5f5f5;
+}
+
+.progress-bar-container {
+    background: #d8dee4;
+    height: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.progress-fill {
+    background: #4caf50;
+    height: 100%;
+    width: 0;
+    transition: width 0.4s ease-in-out;
+}
+
+#progressText {
+    font-size: 0.9rem;
+    color: #2d6187;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.word-display {
+font-size: 2.5rem; /* 단어 크기 크게 */
+font-weight: 700; /* 단어 강조 */
+color: #2d6187; /* 단어 색상 변경 */
+margin-bottom: 15px; /* 단어와 뜻 사이 간격 */
+}
+
+.meaning-display {
+font-size: 2rem; /* 뜻 크기 증가 */
+font-weight: 600; /* 뜻 강조 */
+color: #4a5568; /* 뜻 색상 강조 */
+margin-bottom: 20px; /* 입력 필드와 간격 조정 */
+}
+
+.user-input {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 입력 필드 사이 간격 */
+}
+.custom-input {
+white-space: pre; /* 공백과 줄 바꿈을 그대로 표시 */
+}
+
+.custom-input,
+.meaning-input {
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    background: #f5f5f5;
+    width: 100%;
+    box-sizing: border-box;
+    height: 40px; /* 고정 높이 */
+    display: flex;
+    align-items: center;
+}
+
+.custom-input span {
+    font-size: 1rem;
+    color: #555;
+}
+
+.custom-input .caret {
+    width: 2px;
+    height: 100%;
+    background-color: #888; /* 은은한 회색 캐럿 */
+}
+
+.custom-input.inactive .caret {
+    display: none;
+}
+
+.feedback {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #e74c3c;
+    font-weight: 600;
+    visibility: hidden;
+}
+
+.control-button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: #2d6187;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.control-button:hover {
+    background: #1b425c;
+}
+
+.control-button:active {
+    transform: scale(0.98);
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>English Typing Game</h1>
+        <div id="progressText" class="progress-bar-container">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div class="file-status" id="fileStatus">No file loaded</div>
+        <div class="file-input" id="fileInputContainer">
+            <label for="csvFileInput">Upload CSV File:</label>
+            <input type="file" id="csvFileInput" accept=".csv">
+        </div>
+
+        <div class="game-display">
+            <div id="word" class="word-display">Word will appear here</div>
+            <div id="meaning" class="meaning-display">Meaning will appear here</div>
+        </div>
+
+        <div class="dictionary-info" id="dictionaryInfo" style="display: none;">
+            <h2>Dictionary Results</h2>
+            <div id="definition"></div>
+            <div id="phonetics"></div>
+            <div id="audio" class="audio"></div>
+        </div>
+
+        <div class="user-input">
+            <div id="customInput" class="custom-input" tabindex="0"></div>
+            <input id="meaningInput" type="text" class="meaning-input" placeholder="Type the meaning here">
+        </div>
+
+        <div id="feedback" class="feedback">Incorrect! Try again.</div>
+        <button id="controlButton" class="control-button">Start Game</button>
+    </div>
+
+    <script>
+        
+let words = [];
+let meanings = [];
+let shuffledIndices = [];
+let currentWordIndex = 0;
+let customContent = "";
+let caretPosition = 0;
+let currentFileName = "";
+let isKoreanMode = false;
+
+const fileStatus = document.getElementById("fileStatus");
+const fileInputContainer = document.getElementById("fileInputContainer");
+const csvFileInput = document.getElementById("csvFileInput");
+const progressText = document.getElementById("progressText");
+const progressFill = document.getElementById("progressFill");
+const customInput = document.getElementById("customInput");
+const meaningInput = document.getElementById("meaningInput");
+const controlButton = document.getElementById("controlButton");
+const feedback = document.getElementById("feedback");
+
+const dictionaryInfo = document.getElementById("dictionaryInfo");
+        const definitionDiv = document.getElementById("definition");
+        const phoneticsDiv = document.getElementById("phonetics");
+        const audioDiv = document.getElementById("audio");
+
+async function fetchDefinition(word) {
+            const LINK_PREFIX = "https://dictionary.cambridge.org";
+            const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+            const url = `${LINK_PREFIX}/dictionary/english/${word}`;
+
+            try {
+                const response = await fetch(`${proxyUrl}${url}`);
+                if (!response.ok) {
+                    throw new Error(`Error fetching data for "${word}".`);
+                }
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+
+                // Extract dictionary details
+                const definitionBlock = doc.querySelector(".def.ddef_d");
+                const definition = definitionBlock ? definitionBlock.textContent.trim() : "Definition not found.";
+
+                const ukIpaBlock = doc.querySelector(".uk .pron.dpron");
+                const ukIpa = ukIpaBlock ? ukIpaBlock.textContent.trim() : "UK IPA not found.";
+
+                const usIpaBlock = doc.querySelector(".us .pron.dpron");
+                const usIpa = usIpaBlock ? usIpaBlock.textContent.trim() : "US IPA not found.";
+
+                const ukAudioSource = doc.querySelector(".uk span.daud source");
+                const ukAudioUrl = ukAudioSource ? `${LINK_PREFIX}${ukAudioSource.getAttribute("src")}` : null;
+
+                const usAudioSource = doc.querySelector(".us span.daud source");
+                const usAudioUrl = usAudioSource ? `${LINK_PREFIX}${usAudioSource.getAttribute("src")}` : null;
+
+                // Update UI with dictionary data
+                definitionDiv.innerHTML = `<strong>Definition:</strong> ${definition}`;
+                phoneticsDiv.innerHTML = `UK: ${ukIpa}<br>US: ${usIpa}`;
+                audioDiv.innerHTML = `
+                    ${ukAudioUrl ? `<strong>UK:</strong> <audio controls><source src="${ukAudioUrl}" type="audio/mpeg"></audio><br>` : ""}
+                    ${usAudioUrl ? `<strong>US:</strong> <audio controls><source src="${usAudioUrl}" type="audio/mpeg"></audio>` : ""}
+                `;
+
+                dictionaryInfo.style.display = "block";
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred while fetching data.");
+            }
+        }
+
+
+csvFileInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        currentFileName = file.name;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            parseCSV(e.target.result);
+            fileStatus.textContent = `Loaded file: ${currentFileName}`;
+            fileStatus.style.display = "block";
+        };
+        reader.readAsText(file);
+    }
+});
+
+controlButton.addEventListener("click", () => {
+    if (words.length > 0) {
+    if (controlButton.textContent === "Start Game") {
+        fileInputContainer.style.display = "none";
+        startGame();
+    } else if (controlButton.textContent === "Skip") {
+        skipWord();
+    }
+    } else {
+        alert("Please upload a valid CSV file.");
+    }
+    });
+    // 커스텀 입력 필드에서의 키 입력을 처리하는 이벤트 리스너
+    customInput.addEventListener("keydown", (event) => {
+    if (event.key === "Backspace") {
+    // 백스페이스 처리
+    if (caretPosition > 0) {
+        customContent =
+            customContent.substring(0, caretPosition - 1) +
+            customContent.substring(caretPosition);
+        caretPosition--;
+        updateCustomInput(); // 커서와 내용을 업데이트
+    }
+    } else if (event.key === "ArrowLeft") {
+    // 왼쪽 화살표 처리
+    if (caretPosition > 0) {
+        caretPosition--;
+        updateCustomInput();
+    }
+    } else if (event.key === "ArrowRight") {
+    // 오른쪽 화살표 처리
+    if (caretPosition < customContent.length) {
+        caretPosition++;
+        updateCustomInput();
+    }
+    } else if (event.key === " ") {
+    // 스페이스바 처리
+    customContent =
+        customContent.substring(0, caretPosition) +
+        " " +  // 스페이스 문자 추가
+        customContent.substring(caretPosition);
+    caretPosition++;  // 커서 위치 업데이트
+    updateCustomInput();
+    } else if (event.key.length === 1) {
+    // 일반 문자 처리
+    const character = isKoreanMode ? inko.en2ko(event.key) : event.key;
+    customContent =
+        customContent.substring(0, caretPosition) +
+        character +
+        customContent.substring(caretPosition);
+    caretPosition++;
+    updateCustomInput();
+    } else if (event.key === "Enter") {
+    // 엔터키 처리
+    event.preventDefault();
+    checkInput();  // 입력 확인
+    }
+    });
+
+    // 커스텀 입력 필드의 텍스트와 커서를 화면에 반영
+    function updateCustomInput() {
+    customInput.innerHTML = "";  // 기존 내용을 지우고
+    // customContent 텍스트를 표시
+    for (let i = 0; i < customContent.length; i++) {
+    const span = document.createElement("span");
+    span.textContent = customContent[i];
+    customInput.appendChild(span);
+    }
+
+    // 커서 표시
+    const caretElement = document.createElement("div");
+    caretElement.className = "caret";
+    customInput.insertBefore(caretElement, customInput.childNodes[caretPosition] || null);
+}
+
+meaningInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault();  // 기본 엔터키 동작 방지
+        checkInput();  // 입력 확인
+    }
+});
+
+
+
+function parseCSV(data) {
+    const rows = data.split(/[\r\n]+/);
+    const regex = /(?:\"([^\"]*)\"|([^,]+))/g;
+    words = [];
+    meanings = [];
+
+    rows.forEach((row) => {
+        const matches = [...row.matchAll(regex)];
+        if (matches.length >= 2) {
+            const english = matches[0][1] || matches[0][2];
+            const meaning = matches[1][1] || matches[1][2];
+            if (english && meaning) {
+                words.push(english.trim());
+                meanings.push(meaning.trim());
+            }
+        }
+    });
+
+    if (words.length === 0) {
+        alert("CSV is empty or incorrectly formatted.");
+    }
+}
+
+function startGame() {
+    shuffledIndices = Array.from({ length: words.length }, (_, i) => i).sort(() => Math.random() - 0.5);
+    currentWordIndex = 0;
+    updateProgress();
+    nextWord();
+    controlButton.textContent = "Skip"; // 게임 시작 시 "Skip" 버튼으로 변경
+}
+
+function nextWord() {
+    if (currentWordIndex >= shuffledIndices.length) {
+        endGame();
+        return;
+    }
+    const word = document.getElementById("word").textContent;
+            fetchDefinition(word); // Fetch and display dictionary info for the current word
+
+
+    const wordIndex = shuffledIndices[currentWordIndex];
+    document.getElementById("word").textContent = words[wordIndex];
+    document.getElementById("meaning").textContent = meanings[wordIndex];
+
+    customContent = ""; // 사용자 입력 초기화
+    caretPosition = 0;
+    meaningInput.value = ""; // 뜻 입력 필드 초기화
+    updateCustomInput(); // 커스텀 입력 필드 업데이트
+    updateProgress(); // 진행 상황 업데이트
+
+    // "meaningInput"에 포커스를 자동으로 주어 사용자가 입력할 수 있도록 함
+    customInput.focus();
+}
+
+function updateProgress() {
+    const progress = currentWordIndex;
+    const total = shuffledIndices.length;
+    progressFill.style.width = `${(progress / total) * 100}%`;
+}
+
+function checkInput() {
+    const wordIndex = shuffledIndices[currentWordIndex];
+    const correctWord = words[wordIndex];
+    const correctMeaning = meanings[wordIndex];
+    const userMeaning = meaningInput.value.trim();
+
+    if (customContent.trim() === correctWord && userMeaning === correctMeaning) {
+        currentWordIndex++;
+        nextWord();
+    } else {
+        feedback.style.visibility = "visible";
+        setTimeout(() => {
+            feedback.style.visibility = "hidden";
+        }, 1500);
+    }
+}
+
+function skipWord() {
+currentWordIndex++;
+    if (currentWordIndex >= shuffledIndices.length) {
+        endGame();
+    } else {
+        nextWord();
+    }
+}
+
+
+function endGame() {
+    document.getElementById("word").textContent = "Game Over (" + words.length + " Words)" ;
+    document.getElementById("meaning").textContent = "게임이 끝났습니다.";
+    controlButton.textContent = "Start Game"; // 게임 종료 시 "Start Game" 버튼으로 변경
+}
+
+    </script>
+
+
+</body></html>
